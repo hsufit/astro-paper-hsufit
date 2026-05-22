@@ -1,0 +1,10 @@
+---
+import AboutLayout from "@/layouts/AboutLayout.astro";
+import AboutContent, { frontmatter } from "../../../source/about/index.md";
+
+const title = frontmatter.title ?? "About";
+---
+
+<AboutLayout frontmatter={{ title }}>
+  <AboutContent />
+</AboutLayout>
