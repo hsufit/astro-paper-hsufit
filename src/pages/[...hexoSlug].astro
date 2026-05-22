@@ -1,0 +1,47 @@
+---
+import { getCollection } from "astro:content";
+import {
+  getHexoRedirectSlug,
+  getPostRedirectTarget,
+} from "@/utils/hexoRedirect";
+
+export const prerender = true;
+
+type Props = {
+  targetPath: string;
+  title: string;
+};
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog", ({ data }) => !data.draft);
+
+  return posts.map(post => ({
+    params: { hexoSlug: getHexoRedirectSlug(post) },
+    props: {
+      targetPath: getPostRedirectTarget(post),
+      title: post.data.title,
+    },
+  }));
+}
+
+const { targetPath, title } = Astro.props as Props;
+const basePath = import.meta.env.BASE_URL.replace(/\/$/, "");
+const targetUrl = `${basePath}${targetPath}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <meta http-equiv="refresh" content={`0; url=${targetUrl}`} />
+    <link rel="canonical" href={targetUrl} />
+    <title>Redirecting to {title}</title>
+  </head>
+  <body>
+    <p>Redirecting to <a href={targetUrl}>{title}</a>.</p>
+    <script is:inline>
+      window.location.replace(document.querySelector("link[rel='canonical']").href);
+    </script>
+  </body>
+</html>
