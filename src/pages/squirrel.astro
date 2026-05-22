@@ -1,0 +1,10 @@
+---
+import SquirrelLayout from "@/layouts/SquirrelLayout.astro";
+import SquirrelContent, { frontmatter } from "../../../source/squirrel/index.md";
+
+const title = frontmatter.title ?? "Squirrel";
+---
+
+<SquirrelLayout frontmatter={{ title }}>
+  <SquirrelContent />
+</SquirrelLayout>
