@@ -14,7 +14,7 @@ export const SITE = {
   editPost: {
     enabled: true,
     text: "Edit page",
-    url: "https://github.com/hsufit/hsufit.github.io/tree/astro-paper/",
+    url: "https://github.com/hsufit/hsufit.github.io/tree/astro-paper/source/",
   },
   dynamicOgImage: true,
   dir: "ltr", // "rtl" | "auto"
