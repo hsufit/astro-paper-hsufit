@@ -16,7 +16,13 @@ export default defineConfig({
   site: SITE.website,
   integrations: [
     sitemap({
-      filter: page => SITE.showArchives || !page.endsWith("/archives"),
+      filter: page => {
+        const pathname = new URL(page).pathname;
+        const isDraftPage = pathname.startsWith("/draft/");
+        const isArchivesPage = pathname.endsWith("/archives");
+
+        return !isDraftPage && (SITE.showArchives || !isArchivesPage);
+      },
     }),
   ],
   markdown: {

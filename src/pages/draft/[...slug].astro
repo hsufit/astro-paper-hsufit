@@ -1,0 +1,93 @@
+---
+import { getCollection, render, type CollectionEntry } from "astro:content";
+import Layout from "@/layouts/Layout.astro";
+import Header from "@/components/Header.astro";
+import Footer from "@/components/Footer.astro";
+import Tag from "@/components/Tag.astro";
+import Datetime from "@/components/Datetime.astro";
+import {
+  getDraftPath,
+  getDraftSourcePath,
+  getDraftTitle,
+} from "@/utils/drafts";
+import { slugifyStr } from "@/utils/slugify";
+import { SITE } from "@/config";
+
+type DraftEntry = CollectionEntry<"drafts">;
+
+type Props = {
+  draft: DraftEntry;
+};
+
+export async function getStaticPaths() {
+  const drafts = await getCollection("drafts");
+
+  return drafts.map(draft => ({
+    params: { slug: getDraftPath(draft).replace(/^\/draft\//, "") },
+    props: { draft },
+  }));
+}
+
+const { draft } = Astro.props;
+const { Content } = await render(draft);
+
+const title = getDraftTitle(draft);
+const description = draft.data.description ?? `Draft note: ${title}`;
+const pubDatetime = draft.data.pubDatetime ?? undefined;
+const modDatetime = draft.data.modDatetime;
+const tags = draft.data.tags ?? ["draft"];
+const sourcePath = getDraftSourcePath(draft);
+---
+
+<Layout
+  title={`${title} | Draft | ${SITE.title}`}
+  description={description}
+  pubDatetime={pubDatetime}
+  modDatetime={modDatetime}
+  robots="noindex, nofollow"
+  scrollSmooth
+>
+  <Header />
+  <main
+    id="main-content"
+    class="app-layout py-8"
+    data-pagefind-ignore
+  >
+    <a
+      href="/draft/"
+      class="text-sm text-accent underline-offset-4 hover:underline"
+    >
+      Back to draft index
+    </a>
+
+    <h1 class="mt-6 text-2xl font-bold text-accent sm:text-3xl">
+      {title}
+    </h1>
+
+    <div class="mt-3 flex flex-wrap items-center gap-2 text-sm text-accent/75">
+      {
+        pubDatetime && (
+          <>
+            <Datetime {pubDatetime} {modDatetime} size="sm" />
+            <span aria-hidden="true">|</span>
+          </>
+        )
+      }
+      <span>{sourcePath}</span>
+    </div>
+
+    <article
+      id="article"
+      class="app-prose mt-8 w-full max-w-app prose-pre:bg-(--shiki-light-bg) dark:prose-pre:bg-(--shiki-dark-bg)"
+    >
+      <Content />
+    </article>
+
+    <hr class="my-8 border-dashed" />
+
+    <ul class="flex flex-wrap gap-3">
+      {tags.map(tag => <Tag tag={slugifyStr(tag)} tagName={tag} size="sm" />)}
+    </ul>
+  </main>
+  <Footer />
+</Layout>
